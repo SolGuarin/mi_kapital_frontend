@@ -7,7 +7,7 @@
             id="input-group-1" 
             label="Fecha" 
             label-for="input-1">
-            <b-form-datepicker id="input-1" v-model="date"></b-form-datepicker>
+            <b-form-datepicker id="input-1" v-model="movementToInsert.date"></b-form-datepicker>
         </b-form-group>
 
         <b-form-group
@@ -26,6 +26,7 @@
                     {{ option.name }}
                 </b-dropdown-item>
             </b-dropdown> 
+            <p>{{ movementToInsert.account_id }}</p>
         </b-form-group>
 
         <b-form-group
@@ -40,10 +41,12 @@
                 <b-dropdown-item v-for="option in categoryList" 
                     :key="option.id" 
                     :value="option.name"
-                    @click="movementToInsert.category_id = option.id">
+                    @click="movementToInsert.category_id = option.id"
+                    >
                     {{ option.name }}
                 </b-dropdown-item>
             </b-dropdown> 
+            <p>{{ movementToInsert.category_id }}</p>
         </b-form-group>
 
         <b-form-group
@@ -61,7 +64,9 @@
                     @click="movementToInsert.type = option.name">
                     {{ option.name }}
                 </b-dropdown-item>
+                
             </b-dropdown> 
+            <p>{{ movementToInsert.type}}</p>
         </b-form-group>
 
         <b-form-group
@@ -70,7 +75,7 @@
           label-for="input-5"
           description="Ingrese el valor del movimiento"
         >
-          <b-form-input id="input-2" v-model="amount" type="number" required></b-form-input>
+          <b-form-input id="input-2" v-model="movementToInsert.amount" type="number" required></b-form-input>
         </b-form-group>
 
         <b-form-group
@@ -79,7 +84,7 @@
           label-for="input-6"
           description="Agregue una nota"
         >
-          <b-form-input id="input-1" v-model="note" required></b-form-input>
+          <b-form-input id="input-1" v-model="movementToInsert.note" required></b-form-input>
         </b-form-group>
 
         <b-form-group
@@ -88,11 +93,11 @@
           label-for="input-7"
           description="Ingrese una descripción"
         >
-          <b-form-input id="input-1" v-model="description" required></b-form-input>
+          <b-form-input id="input-1" v-model="movementToInsert.description" required></b-form-input>
         </b-form-group>
 
         <b-form-group>
-          <b-button type="submit" class="guardar-transaction">Guardar</b-button>
+          <b-button type="submit" @click.prevent="submitForm" class="guardar-transaction">Guardar</b-button>
           <b-button @click="showModal = false">Cancelar</b-button>
         </b-form-group>
       </b-form>
@@ -117,6 +122,7 @@ export default{
     },
     data(){
         return{
+            
             accountList: [
             {
                 "id": 1,
@@ -140,7 +146,7 @@ export default{
             categoryList: [
             {
                 "id": 1,
-                "name": "ahsnd,",
+                "name": "ahsnd",
                 "type": "ajdknjks"
             },
             {
@@ -166,14 +172,10 @@ export default{
             ],
             showModal: false,
             date: new Date().toISOString().slice(0, 10),
-            account: '',
-            amount: '',
-            note: '',
-            description: '',
             movementToInsert: {
                 account_id: '',
                 category_id: '',
-                amount: '',
+                amount: null,
                 note: '',
                 description: '',
                 from_account_id: null,
@@ -181,30 +183,19 @@ export default{
                 type: '',
                 date: ''
             }
-
         }
     },
     methods: {
         async submitForm () {
-            const formData = {
-                account_id: this.movementToInsert.account_id,
-                category_id: this.movementToInsert.category_id,
-                amount: this.movementToInsert.amount,
-                note: this.movementToInsert.note,
-                description: this.movementToInsert.description,
-                from_account_id: this.movementToInsert.from_account_id,
-                to_account_id: this.movementToInsert.to_account_id,
-                type: this.movementToInsert.type,
-                date: this.movementToInsert.date
-            };
+            const formData = this.movementToInsert;
 
             try {
-                const response = await axios.post('http://127.0.0.1:8000/movements', formData)
+                const response = await axios.post('http://127.0.0.1:8000/movements', formData);
                 console.log(response.data);
-            } catch(error){
-                console.log(error);
+            } catch (error) {
+                console.error(error);
             }
-        }
+        }   
     }
 
 }
