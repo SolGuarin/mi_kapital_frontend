@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div class="container">
     <b-button @click="showModal = true" class="add-transaction">Add Transaction</b-button>
     <b-modal v-model="showModal" title="Add Movement">
-      <b-form @submit.prevent="submitForm">
+      <b-form @submit.prevent="submitForm" class="formTransaction">
         <b-form-group 
             id="input-group-1" 
             label="Fecha" 
@@ -29,7 +29,7 @@
             <p>{{ movementToInsert.account_id }}</p>
         </b-form-group>
 
-        <b-form-group
+        <b-form-group class="max-height"
           id="input-group-3"
           label="Category:"
           label-for="input-3"
@@ -123,43 +123,8 @@ export default{
     data(){
         return{
             
-            accountList: [
-            {
-                "id": 1,
-                "name": "Bancolombia",
-                "type": "Debito",
-                "note": "cuenta de ahorros"
-            },
-            {
-                "id": 6,
-                "name": "MasterCard",
-                "type": "Credito",
-                "note": "Nada"
-            },
-            {
-                "id": 3,
-                "name": "Bancolombia",
-                "type": "Credito",
-                "note": "Corriente"
-            }
-            ],
-            categoryList: [
-            {
-                "id": 1,
-                "name": "ahsnd",
-                "type": "ajdknjks"
-            },
-            {
-                "id": 2,
-                "name": "Food",
-                "type": "Expenses"
-            },
-            {
-                "id": 5,
-                "name": "Interest",
-                "type": "Income"
-            }
-            ],
+            accountList: [],
+            categoryList: [],
             typeList: [
                 {
                     "id": 1,
@@ -195,13 +160,51 @@ export default{
             } catch (error) {
                 console.error(error);
             }
-        }   
+        },
+
+        getAccounts () {
+            axios.get('http://127.0.0.1:8000/accounts', {
+                headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-type': 'application/json',
+                }
+            })
+            .then((response) => {
+                return response["data"]
+            })
+            .then((data) => {
+                this.accountList = data
+            })
+        },
+        
+        getCategories () {
+            axios.get('http://127.0.0.1:8000/categories', {
+                headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-type': 'application/json',
+                }
+            })
+            .then((response) => {
+                return response["data"]
+            })
+            .then((data) => {
+                this.categoryList = data
+            })
+        },
+    },
+    
+    mounted () {
+        this.getCategories();
+        this.getAccounts();
     }
 
 }
 </script>
 
 <style scoped>
+.formTransaction{
+    font-family: Avenir, Helvetica, Arial, sans-serif;;
+}
 .add-transaction{
     width: 15rem;
     height: 3rem;
@@ -214,4 +217,9 @@ export default{
     background-color: green;
     margin-right: 0.5rem;
 }
+.max-height {
+    max-height: 30rem;
+    overflow: auto; /* Agrega scroll cuando el menú desplegable supere la altura máxima */
+}
+
 </style>
