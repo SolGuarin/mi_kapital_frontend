@@ -24,9 +24,32 @@
       <b-row class="body">
 
         <b-col cols="2" class="items">
-          <button v-for="(item, i) in itemsoptions" :key="i" class="items-options">
-            <img v-bind:src="item.image" alt="" class="img-movement">
-            <p>{{ item.tittle }}</p>
+          
+          <ShowMovements/>
+
+          <button class="items-options">
+            <img v-bind:src="transactions.image" alt="" class="img-movement">
+            <p>{{ transactions.tittle }}</p>
+          </button>
+
+          <button class="items-options">
+            <img v-bind:src="statistics.image" alt="" class="img-movement">
+            <p>{{ statistics.tittle }}</p>
+          </button>
+
+          <button class="items-options">
+            <img v-bind:src="debts.image" alt="" class="img-movement">
+            <p>{{ debts.tittle }}</p>
+          </button>
+
+          <button class="items-options">
+            <img v-bind:src="investments.image" alt="" class="img-movement">
+            <p>{{ investments.tittle }}</p>
+          </button>
+
+          <button class="items-options">
+            <img v-bind:src="reports.image" alt="" class="img-movement">
+            <p>{{ reports.tittle }}</p>
           </button>
         </b-col>
 
@@ -43,6 +66,7 @@
 <script>
 import HelloWorld from './components/HelloWorld.vue'
 import AddTransaction from './components/AddTransaction.vue';
+import ShowMovements from './components/ShowMovements.vue';
 
 
 export default {
@@ -50,10 +74,34 @@ export default {
   components: {
     HelloWorld,
     AddTransaction,
-    },
+    ShowMovements
+},
   data() {
     return {
       cash: "COL $3,975,000",
+      
+      transactions: {
+        image: 'https://static.vecteezy.com/system/resources/previews/002/206/090/non_2x/money-transaction-icon-free-vector.jpg',
+        tittle: 'Transacciones'
+      },
+      statistics: {
+        image: 'https://static.vecteezy.com/system/resources/previews/002/509/476/non_2x/statistics-report-coin-business-cash-money-line-design-free-vector.jpg',
+        tittle: 'Estadísticas'
+      },
+      debts: {
+        image: 'https://c8.alamy.com/compes/2c6xj2t/facturas-para-pagar-vector-simple-ahogado-hombre-en-deuda-con-cheque-de-pago-stickman-no-cara-clipart-dibujos-animados-dibujado-a-mano-boceto-de-fideos-ilustracion-grafica-2c6xj2t.jpg',
+        tittle: 'Deudas'
+      },
+      investments: {
+        image: 'https://c8.alamy.com/compes/2ct01kn/icono-de-linea-negra-para-inversores-consultoria-financiera-inversion-y-ahorro-crowdfunding-invertir-dinero-en-un-nuevo-proyecto-firme-para-la-pagina-web-la-aplicacion-ui-ux-2ct01kn.jpg',
+        tittle: 'Inversiones'
+      },
+      reports: {
+        image: 'https://us.123rf.com/450wm/sabuhinovruzov/sabuhinovruzov1812/sabuhinovruzov181200116/112874406-icono-de-l%C3%ADnea-de-lista-y-l%C3%A1piz-portapapeles-con-ilustraci%C3%B3n-de-vector-de-pluma-aislado-en-blanco.jpg?ver=6',
+        tittle: 'Reportes'
+      } 
+      
+      /*
       itemsoptions: [{
         image: 'https://media.istockphoto.com/id/1250594655/es/vector/icono-vectorial-de-factura-factura-de-trazo-editable-ficha-lineal-de-factura-para-su-uso-en.jpg?s=612x612&w=0&k=20&c=xUHbg71mAdw9_IkdxddL5eTo1Dp8UOnVVP1LrgYrjVk=',
         tittle: 'Movimientos'
@@ -78,6 +126,7 @@ export default {
         image: 'https://us.123rf.com/450wm/sabuhinovruzov/sabuhinovruzov1812/sabuhinovruzov181200116/112874406-icono-de-l%C3%ADnea-de-lista-y-l%C3%A1piz-portapapeles-con-ilustraci%C3%B3n-de-vector-de-pluma-aislado-en-blanco.jpg?ver=6',
         tittle: 'Reportes'
       }]
+      */
     }
   }
 }
