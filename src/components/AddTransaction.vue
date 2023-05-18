@@ -281,7 +281,7 @@ export default{
         },
 
         validateCategory(){
-            if (!this.movementToInsert.category){
+            if (!this.movementToInsert.category_id){
                 this.movementToInsertState.category = false;
                 this.movementToInsertStateMsg.category = "Debes seleccionar una categoría";
             }else{
