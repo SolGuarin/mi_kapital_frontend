@@ -58,7 +58,9 @@
         >
         <b-dropdown 
             v-model="movementToInsert.account_id"
-            text="Selecciona una opción">
+            text="Selecciona una cuenta"
+            :state="this.movementToInsertState.account"
+            >
                 <b-dropdown-item v-for="option in accountList" 
                     :key="option.id" 
                     :value="option.name"
@@ -66,6 +68,9 @@
                     {{ option.name }}
                 </b-dropdown-item>
         </b-dropdown> 
+        <b-form-invalid-feedback :state="this.movementToInsertState.account">
+            {{ this.movementToInsertStateMsg.account }}
+        </b-form-invalid-feedback>
             
             <p>{{ movementToInsert.account_id }}</p>
         </b-form-group>
@@ -193,12 +198,14 @@ export default{
                 date: new Date().toISOString().slice(0, 10),
             },
             movementToInsertState: {
+                account: null,
                 category: null,
                 amount: null,
                 note: null
                 
             },
             movementToInsertStateMsg: {
+                account: null,
                 category: null,
                 amount: null,
                 note: null
@@ -219,12 +226,14 @@ export default{
             this.validateAmount();
             this.validateCategory();
             this.validateNote();
+            this.validateAccount();
 
-            if (this.movementToInsertState.amount && this.movementToInsertState.category && this.movementToInsertState.note){
+            if (this.movementToInsertState.amount && this.movementToInsertState.category && this.movementToInsertState.note && this.movementToInsertState.account){
                 const response = await axios.post('http://127.0.0.1:8000/movements', formData);
+                console.log(formData)
                 
                 if (response.status == 201){
-                    console.log("se insertoooooooooooo");
+                    console.log("se insertoooooooooooo con un 201");
 
                 } else{
                     console.log("no funcionooooo :()");
@@ -298,6 +307,15 @@ export default{
                 this.movementToInsertStateMsg.note = "Debes ingresar una nota";
             }else{
                 this.movementToInsertState.note = true;
+            }
+        },
+
+        validateAccount(){
+            if (!this.movementToInsert.account_id){
+                this.movementToInsertState.account = false;
+                this.movementToInsertStateMsg.account = "Debes seleccionar una cuenta";
+            }else{
+                this.movementToInsertState.account = true;
             }
         }
     },
