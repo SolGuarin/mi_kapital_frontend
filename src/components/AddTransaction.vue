@@ -18,7 +18,9 @@
         >
         <b-dropdown 
             v-model="movementToInsert.type"
-            text="Selecciona una opción">
+            text="Selecciona una opción"
+            :state="this.movementToInsertState.type"
+            >
                 <b-dropdown-item v-for="option in typeList" 
                     :key="option.id" 
                     :value="option.type"
@@ -28,6 +30,9 @@
                 
             </b-dropdown> 
             <p>{{ movementToInsert.type}}</p>
+            <b-form-invalid-feedback :state="this.movementToInsertState.type">
+            {{ this.movementToInsertStateMsg.type }}
+        </b-form-invalid-feedback>
         </b-form-group>
 
         <b-form-group
@@ -197,11 +202,12 @@ export default{
                 description: '',
                 from_account_id: null,
                 to_account_id: null,
-                type: 'Expenses',
+                type: '',
                 currency: '',
                 date: new Date().toISOString().slice(0, 10),
             },
             movementToInsertState: {
+                type: null,
                 currency: null,
                 account: null,
                 category: null,
@@ -210,6 +216,7 @@ export default{
                 
             },
             movementToInsertStateMsg: {
+                type: null,
                 currency: null,
                 account: null,
                 category: null,
@@ -234,9 +241,10 @@ export default{
             this.validateNote();
             this.validateAccount();
             this.validateCurrency();
+            this.validateType();
         
 
-            if (this.movementToInsertState.amount && this.movementToInsertState.category && this.movementToInsertState.note && this.movementToInsertState.account && this.movementToInsertState.currency){
+            if (this.movementToInsertState.amount && this.movementToInsertState.category && this.movementToInsertState.note && this.movementToInsertState.account && this.movementToInsertState.currency && this.movementToInsertState.type){
                 const response = await axios.post('http://127.0.0.1:8000/movements', formData);
                 console.log(formData)
                 
@@ -332,6 +340,15 @@ export default{
                 this.movementToInsertStateMsg.currency = "Debes seleccionar una cuenta";
             }else{
                 this.movementToInsertState.currency = true;
+            }
+        },
+
+        validateType() {
+            if (!this.movementToInsert.type){
+                this.movementToInsertState.type = false;
+                this.movementToInsertStateMsg.type = "Debes el tipo del movimiento";
+            }else{
+                this.movementToInsertState.type = true;
             }
         }
     },
