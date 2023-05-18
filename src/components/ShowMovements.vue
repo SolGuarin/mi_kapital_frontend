@@ -5,8 +5,9 @@
             <p class="title">{{ movements.tittle }}</p>
         </b-button>
 
-        <b-modal size="xl" class="modalMovements" v-model="showModal" title="Movements" header-bg-variant="success" >
-            <table responsive>
+        <b-modal size="xl" class="modalMovements" v-model="showModal" title="Movements" header-bg-variant="success" centered>
+            <b-container class="text-center"> 
+            <table>
                 <thead>
                     <tr>
                     <th>Fecha</th>
@@ -18,23 +19,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>{{ movimientos[0].date }}</td>
-                        <td>{{ movimientos[0].amount }}</td>
-                        <td>{{ movimientos[0].type }}</td>
-                        <td>{{ movimientos[0].category.name }}</td>
-                        <td>{{ movimientos[0].note }}</td>
-                        <td>{{ movimientos[0].description }}</td>  
+                    <tr v-for="(item, i) in movementList" :key="i">
+                        <td>{{ item.date }}</td>
+                        <td>{{ item.amount }}</td>
+                        <td>{{ item.type }}</td>
+                        <td>{{ item.category.name }}</td>
+                        <td>{{ item.note }}</td>
+                        <td>{{ item.description }}</td>  
                     </tr>
                     
                 </tbody>
             </table>
+            </b-container>
         </b-modal>
     </div>
 </template>
 
 <script>
-
+import axios from 'axios'
 export default {
     name: 'ShowMovements',
     
@@ -46,27 +48,28 @@ export default {
             tittle: 'Movimientos'
             },
             showModal: false,
-            movimientos: [
-                {
-                    "amount": 20000,
-                    "note": "Palos de queso y pastel de pollo",
-                    "description": "En la cafeteria al frente de la Coogranada, empezó a llover y nos quedamos comiendo ahí sol y yo",
-                    "type": "Expenses",
-                    "date": "2022-12-17",
-                    "account": {
-                        "id": 1,
-                        "name": "Bancolombia",
-                        "type": "Debito",
-                        "note": "cuenta de ahorros"
-                    },
-                    "category": {
-                        "id": 2,
-                        "name": "Food",
-                        "type": "Expenses"
-                    }
-                }
-            ]
+            movementList: [],
         }
+    }, 
+
+    methods: {
+        getMovements(){
+            axios.get('http://127.0.0.1:8000/movements', {
+                headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-type': 'application/json',
+                }
+            })
+            .then((response) => {
+                return response["data"]
+            })
+            .then((data) => {
+                this.movementList = data
+            })
+        }
+    },
+    mounted(){
+        this.getMovements()
     }
 }
 </script>
@@ -90,10 +93,20 @@ export default {
     color: black;
 }
 th{
-    padding-right: 3rem;
+    padding-right: 4rem;
 }
 .my-modal-header{
     background-color: green;
 }
+
+th, td {
+  text-align: center;
+  padding: 0.7rem;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
 
 </style>

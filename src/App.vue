@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <b-container class="container-1">
+    <b-container  fluid class="container-1">
       <b-row class="header">
 
         <b-col cols="2" class="d-flex justify-content-center align-items-center img">
@@ -133,6 +133,11 @@ export default {
 </script>
 
 <style>
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -140,6 +145,7 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+
 }
 .container-1{
   height: 100vh;

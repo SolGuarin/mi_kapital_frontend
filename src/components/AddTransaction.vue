@@ -11,45 +11,6 @@
         </b-form-group>
 
         <b-form-group
-          id="input-group-2"
-          label="Account:"
-          label-for="input-2"
-          description="Ingrese la cuenta"
-        >
-            <b-dropdown 
-            v-model="movementToInsert.account_id"
-            text="Selecciona una opción">
-                <b-dropdown-item v-for="option in accountList" 
-                    :key="option.id" 
-                    :value="option.name"
-                    @click="movementToInsert.account_id = option.id">
-                    {{ option.name }}
-                </b-dropdown-item>
-            </b-dropdown> 
-            <p>{{ movementToInsert.account_id }}</p>
-        </b-form-group>
-
-        <b-form-group class="max-height"
-          id="input-group-3"
-          label="Category:"
-          label-for="input-3"
-          description="Ingrese la categoría"
-        >
-        <b-dropdown 
-            v-model="movementToInsert.category_id"
-            text="Selecciona una opción">
-                <b-dropdown-item v-for="option in categoryList" 
-                    :key="option.id" 
-                    :value="option.name"
-                    @click="movementToInsert.category_id = option.id"
-                    >
-                    {{ option.name }}
-                </b-dropdown-item>
-            </b-dropdown> 
-            <p>{{ movementToInsert.category_id }}</p>
-        </b-form-group>
-
-        <b-form-group
           id="input-group-4"
           label="Type:"
           label-for="input-4"
@@ -60,13 +21,80 @@
             text="Selecciona una opción">
                 <b-dropdown-item v-for="option in typeList" 
                     :key="option.id" 
-                    :value="option.name"
-                    @click="movementToInsert.type = option.name">
-                    {{ option.name }}
+                    :value="option.type"
+                    @click="movementToInsert.type = option.type">
+                    {{ option.type }}
                 </b-dropdown-item>
                 
             </b-dropdown> 
             <p>{{ movementToInsert.type}}</p>
+        </b-form-group>
+
+        <b-form-group
+          id="input-group-2"
+          label="Currency:"
+          label-for="input-2"
+          description="Ingrese la cuenta"
+        >
+        <b-dropdown 
+            v-model="movementToInsert.currency"
+            text="Selecciona una opción">
+                <b-dropdown-item v-for="option in currency" 
+                    :key="option.id" 
+                    :value="option.name"
+                    @click="movementToInsert.currency = option.name">
+                    {{ option.name }}
+                </b-dropdown-item>
+        </b-dropdown> 
+            
+            <p>{{ movementToInsert.account_id }}</p>
+        </b-form-group>
+
+        <b-form-group
+          id="input-group-2"
+          label="Account:"
+          label-for="input-2"
+          description="Ingrese la cuenta"
+        >
+        <b-dropdown 
+            v-model="movementToInsert.account_id"
+            text="Selecciona una opción">
+                <b-dropdown-item v-for="option in accountList" 
+                    :key="option.id" 
+                    :value="option.name"
+                    @click="movementToInsert.account_id = option.id">
+                    {{ option.name }}
+                </b-dropdown-item>
+        </b-dropdown> 
+            
+            <p>{{ movementToInsert.account_id }}</p>
+        </b-form-group>
+
+
+        <b-form-group class="max-height"
+          id="input-group-3"
+          label="Category:"
+          label-for="input-3"
+          description="Ingrese la categoría"
+        >
+
+        <b-dropdown 
+            v-model="movementToInsert.category_id"
+            text="Selecciona una categoria"
+            :state="this.movementToInsertState.category"
+            >
+                <b-dropdown-item v-for="option in filteredCategoryList" 
+                    :key="option.id" 
+                    :value="option.name"
+                    @click="movementToInsert.category_id = option.id"
+                    >
+                    {{ option.name }}
+                </b-dropdown-item>
+            </b-dropdown> 
+            <b-form-invalid-feedback :state="this.movementToInsertState.category">
+                {{ this.movementToInsertStateMsg.category }}
+            </b-form-invalid-feedback>
+            <p>{{ movementToInsert.category_id }}</p>
         </b-form-group>
 
         <b-form-group
@@ -75,7 +103,10 @@
           label-for="input-5"
           description="Ingrese el valor del movimiento"
         >
-          <b-form-input id="input-2" v-model="movementToInsert.amount" type="number" required></b-form-input>
+          <b-form-input id="input-2" v-model="movementToInsert.amount" type="number" :state="this.movementToInsertState.amount"  required></b-form-input>
+            <b-form-invalid-feedback :state="this.movementToInsertState.amount">
+                {{ this.movementToInsertStateMsg.amount }}
+            </b-form-invalid-feedback>
         </b-form-group>
 
         <b-form-group
@@ -84,7 +115,10 @@
           label-for="input-6"
           description="Agregue una nota"
         >
-          <b-form-input id="input-1" v-model="movementToInsert.note" required></b-form-input>
+          <b-form-input id="input-1" v-model="movementToInsert.note" :state="this.movementToInsertState.note" required></b-form-input>
+          <b-form-invalid-feedback :state="this.movementToInsertState.note">
+                {{ this.movementToInsertStateMsg.note }}
+            </b-form-invalid-feedback>
         </b-form-group>
 
         <b-form-group
@@ -125,18 +159,27 @@ export default{
             
             accountList: [],
             categoryList: [],
+            currency : [
+                {
+                    id: 1,
+                    name: "COP"
+                },{
+                    id: 2,
+                    name: "USD"
+                }
+            ],
             typeList: [
                 {
                     "id": 1,
-                    "name": 'Expenses'
+                    "type": 'Expenses'
                 },
                 {
                     "id": 2,
-                    "name": 'Income'
+                    "type": 'Income'
                 }
             ],
             showModal: false,
-            date: new Date().toISOString().slice(0, 10),
+             
             movementToInsert: {
                 account_id: '',
                 category_id: '',
@@ -145,21 +188,50 @@ export default{
                 description: '',
                 from_account_id: null,
                 to_account_id: null,
-                type: '',
-                date: ''
+                type: 'Expenses',
+                currency: 'COP',
+                date: new Date().toISOString().slice(0, 10),
+            },
+            movementToInsertState: {
+                category: null,
+                amount: null,
+                note: null
+                
+            },
+            movementToInsertStateMsg: {
+                category: null,
+                amount: null,
+                note: null
+                
             }
+            
         }
     },
     methods: {
         async submitForm () {
             const formData = this.movementToInsert;
+            // if (this.movementToInsert.type == 'Income' || this.movementToInsert.type == 'Expenses' ){
+            //     // Validar campos correspondientes
+            //     console.log("holi");
+            // }else{}
 
-            try {
+
+            this.validateAmount();
+            this.validateCategory();
+            this.validateNote();
+
+            if (this.movementToInsertState.amount && this.movementToInsertState.category && this.movementToInsertState.note){
                 const response = await axios.post('http://127.0.0.1:8000/movements', formData);
-                console.log(response.data);
-            } catch (error) {
-                console.error(error);
+                
+                if (response.status == 201){
+                    console.log("se insertoooooooooooo");
+
+                } else{
+                    console.log("no funcionooooo :()");
+
+                }
             }
+
         },
 
         getAccounts () {
@@ -191,11 +263,53 @@ export default{
                 this.categoryList = data
             })
         },
+
+        validateAmount() {
+            console.log("this ::", this.movementToInsert.amount);
+            if (!this.movementToInsert.amount){
+                this.movementToInsertStateMsg.amount = "El valor es obligatorio";
+                this.movementToInsertState.amount = false;
+            } else if (this.movementToInsert.amount <= 0){
+                this.movementToInsertStateMsg.amount = "El valor debe ser mayor a 0";
+                this.movementToInsertState.amount = false;
+            } 
+            else {
+                this.movementToInsertState.amount = true;
+                this.movementToInsertState.amount = true;
+                console.log("holi");
+            }
+        },
+
+        validateCategory(){
+            if (!this.movementToInsert.category){
+                this.movementToInsertState.category = false;
+                this.movementToInsertStateMsg.category = "Debes seleccionar una categoría";
+            }else{
+                this.movementToInsertState.category = true;
+            }
+
+            console.log(this.movementToInsertState)
+            console.log(!this.movementToInsert.category)
+        },
+
+        validateNote(){
+            if (!this.movementToInsert.note){
+                this.movementToInsertState.note = false;
+                this.movementToInsertStateMsg.note = "Debes ingresar una nota";
+            }else{
+                this.movementToInsertState.note = true;
+            }
+        }
     },
     
     mounted () {
         this.getCategories();
         this.getAccounts();
+    },
+    computed: {
+        filteredCategoryList() {
+            return this.categoryList.filter(option => option.type === this.movementToInsert.type);
+        }
     }
 
 }
