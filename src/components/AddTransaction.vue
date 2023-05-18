@@ -34,11 +34,13 @@
           id="input-group-2"
           label="Currency:"
           label-for="input-2"
-          description="Ingrese la cuenta"
+          description="Ingrese la moneda"
         >
         <b-dropdown 
             v-model="movementToInsert.currency"
-            text="Selecciona una opción">
+            text="Selecciona una moneda"
+            :state="this.movementToInsertState.currency"
+            >
                 <b-dropdown-item v-for="option in currency" 
                     :key="option.id" 
                     :value="option.name"
@@ -46,7 +48,9 @@
                     {{ option.name }}
                 </b-dropdown-item>
         </b-dropdown> 
-            
+        <b-form-invalid-feedback :state="this.movementToInsertState.currency">
+            {{ this.movementToInsertStateMsg.currency }}
+        </b-form-invalid-feedback>
             <p>{{ movementToInsert.account_id }}</p>
         </b-form-group>
 
@@ -194,10 +198,11 @@ export default{
                 from_account_id: null,
                 to_account_id: null,
                 type: 'Expenses',
-                currency: 'COP',
+                currency: '',
                 date: new Date().toISOString().slice(0, 10),
             },
             movementToInsertState: {
+                currency: null,
                 account: null,
                 category: null,
                 amount: null,
@@ -205,6 +210,7 @@ export default{
                 
             },
             movementToInsertStateMsg: {
+                currency: null,
                 account: null,
                 category: null,
                 amount: null,
@@ -227,8 +233,10 @@ export default{
             this.validateCategory();
             this.validateNote();
             this.validateAccount();
+            this.validateCurrency();
+        
 
-            if (this.movementToInsertState.amount && this.movementToInsertState.category && this.movementToInsertState.note && this.movementToInsertState.account){
+            if (this.movementToInsertState.amount && this.movementToInsertState.category && this.movementToInsertState.note && this.movementToInsertState.account && this.movementToInsertState.currency){
                 const response = await axios.post('http://127.0.0.1:8000/movements', formData);
                 console.log(formData)
                 
@@ -285,7 +293,6 @@ export default{
             else {
                 this.movementToInsertState.amount = true;
                 this.movementToInsertState.amount = true;
-                console.log("holi");
             }
         },
 
@@ -316,6 +323,15 @@ export default{
                 this.movementToInsertStateMsg.account = "Debes seleccionar una cuenta";
             }else{
                 this.movementToInsertState.account = true;
+            }
+        },
+
+        validateCurrency() {
+            if (!this.movementToInsert.currency){
+                this.movementToInsertState.currency = false;
+                this.movementToInsertStateMsg.currency = "Debes seleccionar una cuenta";
+            }else{
+                this.movementToInsertState.currency = true;
             }
         }
     },
