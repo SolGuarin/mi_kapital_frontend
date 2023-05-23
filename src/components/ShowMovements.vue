@@ -23,7 +23,7 @@
                         <td>{{ item.date }}</td>
                         <td>{{ item.amount }}</td>
                         <td>{{ item.type }}</td>
-                        <td>{{ item.category.name }}</td>
+                        <td v-if="item.type === 'Expenses' || item.type === 'Income'">{{ item.category.name }}</td>
                         <td>{{ item.note }}</td>
                         <td>{{ item.description }}</td>  
                     </tr>
