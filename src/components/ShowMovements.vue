@@ -93,7 +93,7 @@ export default {
     color: black;
 }
 th{
-    padding-right: 4rem;
+    padding-right: 2rem;
 }
 .my-modal-header{
     background-color: green;

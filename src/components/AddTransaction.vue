@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <b-button @click="showModal = true" class="add-transaction">Add Transaction</b-button>
-    <b-modal v-model="showModal" title="Add Movement">
+    <b-modal v-model="showModal" title="Add Movement" hide-footer>
       <b-form @submit.prevent="submitForm" class="formTransaction">
         <b-form-group 
             id="input-group-1" 
@@ -64,6 +64,7 @@
           label="Account:"
           label-for="input-2"
           description="Ingrese la cuenta"
+          v-if="movementToInsert.type === 'Expenses' || movementToInsert.type === 'Income'"
         >
         <b-dropdown 
             v-model="movementToInsert.account_id"
@@ -90,12 +91,14 @@
           label="Category:"
           label-for="input-3"
           description="Ingrese la categoría"
+          v-if="movementToInsert.type === 'Expenses' || movementToInsert.type === 'Income'"
         >
 
         <b-dropdown 
             v-model="movementToInsert.category_id"
             text="Selecciona una categoria"
             :state="this.movementToInsertState.category"
+            
             >
                 <b-dropdown-item v-for="option in filteredCategoryList" 
                     :key="option.id" 
@@ -110,6 +113,58 @@
             </b-form-invalid-feedback>
             <p>{{ movementToInsert.category_id }}</p>
         </b-form-group>
+
+        <b-form-group
+          id="input-group-2"
+          label="From Account:"
+          label-for="input-2"
+          description="Ingrese la cuenta"
+          :state="this.movementToInsertState.from_account_id"
+          v-if="movementToInsert.type === 'Transfer'"
+        >
+        <b-dropdown 
+            v-model="movementToInsert.from_account_id"
+            text="Selecciona una cuenta"
+            >
+                <b-dropdown-item v-for="option in accountList" 
+                    :key="option.id" 
+                    :value="option.name"
+                    @click="movementToInsert.from_account_id = option.id">
+                    {{ option.name }}
+                </b-dropdown-item>
+        </b-dropdown>
+            <b-form-invalid-feedback :state="this.movementToInsertState.from_account_id">
+                {{ this.movementToInsertStateMsg.from_account_id }}
+            </b-form-invalid-feedback>
+            
+            <p>{{ movementToInsert.account_id }}</p>
+        </b-form-group>
+
+        <b-form-group
+          id="input-group-2"
+          label="To Account:"
+          label-for="input-2"
+          description="Ingrese la cuenta"
+          :state="this.movementToInsertState.to_account_id"
+          v-if="movementToInsert.type === 'Transfer'"
+        >
+        <b-dropdown 
+            v-model="movementToInsert.to_account_id"
+            text="Selecciona una cuenta"
+            >
+                <b-dropdown-item v-for="option in accountList" 
+                    :key="option.id" 
+                    :value="option.name"
+                    @click="movementToInsert.to_account_id = option.id">
+                    {{ option.name }}
+                </b-dropdown-item>
+        </b-dropdown> 
+            <b-form-invalid-feedback :state="this.movementToInsertState.to_account_id">
+                {{ this.movementToInsertStateMsg.to_account_id }}
+            </b-form-invalid-feedback>
+            <p>{{ movementToInsert.account_id }}</p>
+        </b-form-group>
+
 
         <b-form-group
           id="input-group-5"
@@ -190,19 +245,22 @@ export default{
                 {
                     "id": 2,
                     "type": 'Income'
+                },
+                {
+                    "id": 3,
+                    "type": 'Transfer'
                 }
             ],
             showModal: false,
-             
             movementToInsert: {
-                account_id: '',
-                category_id: '',
+                account_id: null,
+                category_id: null,
                 amount: null,
                 note: '',
                 description: '',
                 from_account_id: null,
                 to_account_id: null,
-                type: '',
+                type: 'Expenses',
                 currency: '',
                 date: new Date().toISOString().slice(0, 10),
             },
@@ -212,8 +270,9 @@ export default{
                 account: null,
                 category: null,
                 amount: null,
-                note: null
-                
+                note: null,
+                from_account_id: null,
+                to_account_id: null  
             },
             movementToInsertStateMsg: {
                 type: null,
@@ -221,8 +280,9 @@ export default{
                 account: null,
                 category: null,
                 amount: null,
-                note: null
-                
+                note: null,
+                from_account_id: null,
+                to_account_id: null
             }
             
         }
@@ -242,14 +302,50 @@ export default{
             this.validateAccount();
             this.validateCurrency();
             this.validateType();
+            this.validateFromAccount();
+            this.validateToAccount();
         
 
-            if (this.movementToInsertState.amount && this.movementToInsertState.category && this.movementToInsertState.note && this.movementToInsertState.account && this.movementToInsertState.currency && this.movementToInsertState.type){
+            if (
+                this.movementToInsertState.amount && 
+                this.movementToInsertState.category && 
+                this.movementToInsertState.note && 
+                this.movementToInsertState.account &&
+                this.movementToInsertState.currency && 
+                this.movementToInsertState.type &&
+                (this.movementToInsert.type === "Expenses" ||this.movementToInsert.type === "Income" )
+                ){
                 const response = await axios.post('http://127.0.0.1:8000/movements', formData);
                 console.log(formData)
                 
                 if (response.status == 201){
                     console.log("se insertoooooooooooo con un 201");
+                    alert('Guardado');
+                    this.showModal = false;
+                    
+
+                } else{
+                    console.log("no funcionooooo :()");
+
+                }
+            } else if (
+                this.movementToInsertState.amount && 
+                this.movementToInsertState.note && 
+                this.movementToInsertState.currency && 
+                this.movementToInsertState.type && 
+                this.movementToInsertState.from_account_id && 
+                this.movementToInsertState.to_account_id &&
+                this.movementToInsert.type === "Transfer"
+                ){
+                const response = await axios.post('http://127.0.0.1:8000/movements', formData);
+                console.log(formData);
+                console.log("Estoy en tranfeeeeerrrr");
+                
+                if (response.status == 201){
+                    console.log("se insertoooooooooooo con un 201");
+                    alert('Guardado');
+                    this.showModal = false;
+                    
 
                 } else{
                     console.log("no funcionooooo :()");
@@ -349,6 +445,27 @@ export default{
                 this.movementToInsertStateMsg.type = "Debes el tipo del movimiento";
             }else{
                 this.movementToInsertState.type = true;
+            }
+        },
+
+        validateFromAccount(){
+            if (!this.movementToInsert.from_account_id){
+                this.movementToInsertState.from_account_id = false;
+                this.movementToInsertStateMsg.from_account_id = "Debes ingresar una cuenta";
+            }else{
+                this.movementToInsertState.from_account_id = true;
+            }
+        },
+
+        validateToAccount(){
+            if (!this.movementToInsert.to_account_id){
+                this.movementToInsertState.to_account_id = false;
+                this.movementToInsertStateMsg.to_account_id = "Debes ingresar una cuentaaaa";
+            } else if (this.movementToInsert.from_account_id === this.movementToInsert.to_account_id){
+                this.movementToInsertState.to_account_id = false;
+                this.movementToInsertStateMsg.to_account_id = "Debes ingresar una cuenta diferente a la cuenta de origen";
+            }else{
+                this.movementToInsertState.to_account_id = true;
             }
         }
     },
