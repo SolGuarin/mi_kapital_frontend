@@ -304,7 +304,8 @@ export default{
             this.validateType();
             this.validateFromAccount();
             this.validateToAccount();
-        
+                
+    
 
             if (
                 this.movementToInsertState.amount && 
@@ -314,8 +315,11 @@ export default{
                 this.movementToInsertState.currency && 
                 this.movementToInsertState.type &&
                 (this.movementToInsert.type === "Expenses" ||this.movementToInsert.type === "Income" )
-                ){
-                const response = await axios.post('http://127.0.0.1:8000/movements', formData);
+            ){
+                
+                const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNjg4NTI2MDgyfQ.iuABJSNO_JEvi51QV3nmb6QKlrnosyw5qBsiu5IpFHI';
+                const config = {headers: {'Authorization': `Bearer ${token}`}};
+                const response = await axios.post('http://127.0.0.1:8000/movements', formData, config);
                 console.log(formData)
                 
                 if (response.status == 201){
@@ -336,8 +340,11 @@ export default{
                 this.movementToInsertState.from_account_id && 
                 this.movementToInsertState.to_account_id &&
                 this.movementToInsert.type === "Transfer"
-                ){
-                const response = await axios.post('http://127.0.0.1:8000/movements', formData);
+            ){
+                const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNjg4NTI2MDgyfQ.iuABJSNO_JEvi51QV3nmb6QKlrnosyw5qBsiu5IpFHI';
+                const config = {headers: {'Authorization': `Bearer ${token}`}};
+
+                const response = await axios.post('http://127.0.0.1:8000/movements', formData, config);
                 console.log(formData);
                 console.log("Estoy en tranfeeeeerrrr");
                 
@@ -356,10 +363,13 @@ export default{
         },
 
         getAccounts () {
+            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNjg4NTI2MDgyfQ.iuABJSNO_JEvi51QV3nmb6QKlrnosyw5qBsiu5IpFHI';
+
             axios.get('http://127.0.0.1:8000/accounts', {
                 headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Content-type': 'application/json',
+                'Authorization': `Bearer ${token}`
                 }
             })
             .then((response) => {
@@ -371,10 +381,13 @@ export default{
         },
         
         getCategories () {
+            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNjg4NTI2MDgyfQ.iuABJSNO_JEvi51QV3nmb6QKlrnosyw5qBsiu5IpFHI';
+
             axios.get('http://127.0.0.1:8000/categories', {
                 headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 }
             })
             .then((response) => {

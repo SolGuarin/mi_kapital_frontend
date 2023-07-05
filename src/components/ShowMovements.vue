@@ -54,10 +54,13 @@ export default {
 
     methods: {
         getMovements(){
+            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNjg4NTI2MDgyfQ.iuABJSNO_JEvi51QV3nmb6QKlrnosyw5qBsiu5IpFHI';
+
             axios.get('http://127.0.0.1:8000/movements', {
                 headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Content-type': 'application/json',
+                'Authorization': `Bearer ${token}`
                 }
             })
             .then((response) => {
