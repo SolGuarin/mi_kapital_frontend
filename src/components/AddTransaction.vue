@@ -223,6 +223,9 @@ export default{
         BFormInput,
 
     },
+    props: {
+        accessToken: String
+    },
     data(){
         return{
             
@@ -314,23 +317,17 @@ export default{
                 this.movementToInsertState.account &&
                 this.movementToInsertState.currency && 
                 this.movementToInsertState.type &&
-                (this.movementToInsert.type === "Expenses" ||this.movementToInsert.type === "Income" )
+                (this.movementToInsert.type === "Expenses" || this.movementToInsert.type === "Income" )
             ){
-                
-                const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNjg4NTI2MDgyfQ.iuABJSNO_JEvi51QV3nmb6QKlrnosyw5qBsiu5IpFHI';
-                const config = {headers: {'Authorization': `Bearer ${token}`}};
-                const response = await axios.post('http://127.0.0.1:8000/movements', formData, config);
+                const response = await axios.post('http://ec2-35-171-243-24.compute-1.amazonaws.com:8000/movements', formData, {headers: {'Authorization': `Bearer ${this.accessToken}`}});
                 console.log(formData)
                 
                 if (response.status == 201){
-                    console.log("se insertoooooooooooo con un 201");
                     alert('Guardado');
                     this.showModal = false;
-                    
 
                 } else{
-                    console.log("no funcionooooo :()");
-
+                    alert('no funcionooooo :()');
                 }
             } else if (
                 this.movementToInsertState.amount && 
@@ -341,35 +338,25 @@ export default{
                 this.movementToInsertState.to_account_id &&
                 this.movementToInsert.type === "Transfer"
             ){
-                const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNjg4NTI2MDgyfQ.iuABJSNO_JEvi51QV3nmb6QKlrnosyw5qBsiu5IpFHI';
-                const config = {headers: {'Authorization': `Bearer ${token}`}};
+                const config = {headers: {'Authorization': `Bearer ${this.accessToken}`}};
 
-                const response = await axios.post('http://127.0.0.1:8000/movements', formData, config);
-                console.log(formData);
-                console.log("Estoy en tranfeeeeerrrr");
+                const response = await axios.post('http://ec2-35-171-243-24.compute-1.amazonaws.com:8000/movements', formData, config);
                 
                 if (response.status == 201){
-                    console.log("se insertoooooooooooo con un 201");
                     alert('Guardado');
                     this.showModal = false;
-                    
-
                 } else{
-                    console.log("no funcionooooo :()");
-
+                    alert('no funcionooooo');
                 }
             }
-
         },
 
         getAccounts () {
-            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNjg4NTI2MDgyfQ.iuABJSNO_JEvi51QV3nmb6QKlrnosyw5qBsiu5IpFHI';
-
-            axios.get('http://127.0.0.1:8000/accounts', {
+            axios.get('http://ec2-35-171-243-24.compute-1.amazonaws.com:8000/accounts', {
                 headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Content-type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${this.accessToken}`
                 }
             })
             .then((response) => {
@@ -381,13 +368,12 @@ export default{
         },
         
         getCategories () {
-            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNjg4NTI2MDgyfQ.iuABJSNO_JEvi51QV3nmb6QKlrnosyw5qBsiu5IpFHI';
 
-            axios.get('http://127.0.0.1:8000/categories', {
+            axios.get('http://ec2-35-171-243-24.compute-1.amazonaws.com:8000/categories', {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Content-type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${this.accessToken}`
                 }
             })
             .then((response) => {

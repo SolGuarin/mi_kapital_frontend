@@ -17,7 +17,7 @@
         </b-col>
 
         <b-col class="d-flex justify-content-end align-items-center">
-            <AddTransaction/>
+            <AddTransaction :accessToken="accessToken" :key="AddTransactionKey"/>
         </b-col>
       </b-row>
 
@@ -25,7 +25,7 @@
 
         <b-col cols="2" class="items">
           
-          <ShowMovements/>
+          <ShowMovements :accessToken="accessToken" :key="ShowMovementsKey"/>
 
           <button class="items-options">
             <img v-bind:src="transactions.image" alt="" class="img-movement">
@@ -53,31 +53,52 @@
           </button>
         </b-col>
 
-        <b-col class="view-movements">
+        <b-col class="view-movements d-flex justify-content-center align-items-center" >
+          <div v-if="!accessToken">
+            <form @submit.prevent="login">
+              <label for="username">Username:</label>
+              <input type="text" id="username" v-model="username" />
+
+              <label for="password">Password:</label>
+              <input type="password" id="password" v-model="password" />
+
+              <button type="submit">Login</button>
+            </form>
+          </div>
+
+          <!-- <div ref="supersetContainer" id="supersetContainer"> </div>
+          <iframe src="http://localhost:8088/superset/dashboard/29/?token=6b81297f-099d-4e6c-b838-7e045495c923" width="100%" height="600"></iframe> -->
+
+        <!-- </b-col>
+          <button onclick="embedDashboard()">Embeber Dashboard</button>
+        <b-col> -->
 
         </b-col>
       </b-row>
 
     </b-container>
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 import AddTransaction from './components/AddTransaction.vue';
 import ShowMovements from './components/ShowMovements.vue';
+import axios from 'axios'
 
 
 export default {
   name: 'App',
   components: {
-    HelloWorld,
     AddTransaction,
     ShowMovements
 },
   data() {
     return {
+      username: "",
+      password: "",
+      AddTransactionKey: 0,
+      ShowMovementsKey: 0,
+
       cash: "COL $3,975,000",
       
       transactions: {
@@ -99,7 +120,8 @@ export default {
       reports: {
         image: 'https://us.123rf.com/450wm/sabuhinovruzov/sabuhinovruzov1812/sabuhinovruzov181200116/112874406-icono-de-l%C3%ADnea-de-lista-y-l%C3%A1piz-portapapeles-con-ilustraci%C3%B3n-de-vector-de-pluma-aislado-en-blanco.jpg?ver=6',
         tittle: 'Reportes'
-      } 
+      },
+      accessToken: null
       
       /*
       itemsoptions: [{
@@ -128,7 +150,73 @@ export default {
       }]
       */
     }
-  }
+  },
+  methods: {
+    login() {
+
+      const url = 'http://ec2-35-171-243-24.compute-1.amazonaws.com:8000/token';
+      const payload = {
+        grant_type: '',
+        username: this.username,
+        password: this.password
+      };
+      axios.post(url, new URLSearchParams(payload).toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json',
+        },
+      })
+      .then(response => {
+        const token = response.data.access_token;
+        this.accessToken = token;
+        this.forceRerender()
+        // Store the token in local storage or state management
+      })
+      .catch(error => {
+        console.error(error);
+        // Handle any error that occurs during the login process
+      });
+
+      // Perform login logic here using the username and password values
+    },
+    forceRerender() {
+      this.AddTransactionKey += 1;  
+      this.ShowMovementsKey += 1;
+    }
+
+
+  //   async fetchGuestTokenFromBackend () {
+  //     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNjg4OTU1ODE4fQ.uk9GNKrU8jWimrjUvb3vZHfq8NYYaMqMbkqTjyi03og";
+  //     const formData = {
+  //       "user": {
+  //         "username": "frontend",
+  //         "first_name": "Frontend",
+  //         "last_name": "Frontend"
+  //       },
+  //       "resources": [{"type": "dashboard", "id": "ef551888-0fb5-447c-bc83-d658e96ccc60"}]
+  //     }
+  //     const response = await axios.post("http://localhost:8088/superset/dashboard/29/?token=6b81297f-099d-4e6c-b838-7e045495c923", formData, {headers: {'Authorization': `Bearer ${token}`}});
+  //     if (response.status == 201){
+  //       alert('Funciona');
+  //     }
+
+  //   }
+  },
+
+  mounted () {
+    // embedDashboard({
+    //   id: "abc123", // proporcionado por la interfaz de incrustación de Superset
+    //   supersetDomain: "http://localhost:8088",
+    //   mountPoint: this.$refs.supersetContainer, // ref a un elemento HTML que contendrá el iframe
+    //   fetchGuestToken: () => this.fetchGuestTokenFromBackend(),
+    //   dashboardUiConfig: {
+    //     hideTitle: true,
+    //     filters: {
+    //       expanded: true,
+    //     },
+    //   },
+    // });
+  },
 }
 </script>
 
@@ -144,8 +232,6 @@ html, body{
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-
-
 }
 .container-1{
   height: 100vh;

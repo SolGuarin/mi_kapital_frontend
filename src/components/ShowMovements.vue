@@ -39,7 +39,9 @@
 import axios from 'axios'
 export default {
     name: 'ShowMovements',
-    
+    props: {
+        accessToken: String
+    },
     data () {
         return {
             hola: "hola",
@@ -54,13 +56,12 @@ export default {
 
     methods: {
         getMovements(){
-            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNjg4NTI2MDgyfQ.iuABJSNO_JEvi51QV3nmb6QKlrnosyw5qBsiu5IpFHI';
 
-            axios.get('http://127.0.0.1:8000/movements', {
+            axios.get('http://ec2-35-171-243-24.compute-1.amazonaws.com:8000/movements', {
                 headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Content-type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${this.accessToken}`
                 }
             })
             .then((response) => {
