@@ -81,11 +81,9 @@
         <b-form-invalid-feedback :state="this.movementToInsertState.account">
             {{ this.movementToInsertStateMsg.account }}
         </b-form-invalid-feedback>
-            
-            <p>{{ movementToInsert.account_id }}</p>
+
+        <p>{{ movementToInsert.account_id }}</p>
         </b-form-group>
-
-
         <b-form-group class="max-height"
           id="input-group-3"
           label="Category:"

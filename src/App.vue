@@ -7,13 +7,32 @@
           <img src="https://img.myloview.es/cuadros/menu-icon-isolated-on-white-background-web-menu-icon-400-196004480.jpg" alt="" class="menu">
         </b-col>
 
-        <b-col cols="1=" class="d-flex justify-content-center align-items-center img-cash">
+        <b-col cols="1" class="d-flex justify-content-center align-items-center img-cash">
           <img src="https://img.freepik.com/vector-premium/bolsa-dinero-llena-dolares-moneda-oro-ilustracion-vectorial-dibujos-animados_401949-7.jpg?w=2000" alt="" class="cash">
         </b-col>
 
-        <b-col cols="5" class="text-cahs">
+        <b-col cols="2" class="text-cahs">
           <h5>Efectivo</h5>
           <p>{{ cash }}</p>
+        </b-col>
+
+        <b-col>
+          <div v-if="!accessToken" class="div-form d-flex justify-content-center align-items-center">
+            <form @submit.prevent="login" class="d-flex justify-content-center align-items-center">
+              <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" v-model="username" />
+              </div>
+              
+              <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" v-model="password" />
+              </div>
+
+              <button class="mt-4" type="submit">Login</button>
+              
+            </form>
+          </div>
         </b-col>
 
         <b-col class="d-flex justify-content-end align-items-center">
@@ -26,6 +45,7 @@
         <b-col cols="2" class="items">
           
           <ShowMovements :accessToken="accessToken" :key="ShowMovementsKey"/>
+          <ShowDebitTransactions :accessToken="accessToken" :key="ShowDebitTransactionsKey"/>
 
           <button class="items-options">
             <img v-bind:src="transactions.image" alt="" class="img-movement">
@@ -54,17 +74,8 @@
         </b-col>
 
         <b-col class="view-movements d-flex justify-content-center align-items-center" >
-          <div v-if="!accessToken">
-            <form @submit.prevent="login">
-              <label for="username">Username:</label>
-              <input type="text" id="username" v-model="username" />
 
-              <label for="password">Password:</label>
-              <input type="password" id="password" v-model="password" />
-
-              <button type="submit">Login</button>
-            </form>
-          </div>
+          <MovementTransactionLink :accessToken="accessToken" :key="MovementTransactionLinkKey"/>
 
           <!-- <div ref="supersetContainer" id="supersetContainer"> </div>
           <iframe src="http://localhost:8088/superset/dashboard/29/?token=6b81297f-099d-4e6c-b838-7e045495c923" width="100%" height="600"></iframe> -->
@@ -83,6 +94,8 @@
 <script>
 import AddTransaction from './components/AddTransaction.vue';
 import ShowMovements from './components/ShowMovements.vue';
+import ShowDebitTransactions from './components/ShowDebitTransactions.vue';
+import MovementTransactionLink from './components/MovementTransactionLink.vue';
 import axios from 'axios'
 
 
@@ -90,7 +103,9 @@ export default {
   name: 'App',
   components: {
     AddTransaction,
-    ShowMovements
+    ShowMovements,
+    ShowDebitTransactions,
+    MovementTransactionLink
 },
   data() {
     return {
@@ -98,6 +113,7 @@ export default {
       password: "",
       AddTransactionKey: 0,
       ShowMovementsKey: 0,
+      MovementTransactionLinkKey: 0,
 
       cash: "COL $3,975,000",
       
@@ -122,38 +138,10 @@ export default {
         tittle: 'Reportes'
       },
       accessToken: null
-      
-      /*
-      itemsoptions: [{
-        image: 'https://media.istockphoto.com/id/1250594655/es/vector/icono-vectorial-de-factura-factura-de-trazo-editable-ficha-lineal-de-factura-para-su-uso-en.jpg?s=612x612&w=0&k=20&c=xUHbg71mAdw9_IkdxddL5eTo1Dp8UOnVVP1LrgYrjVk=',
-        tittle: 'Movimientos'
-      },
-      {
-        image: 'https://static.vecteezy.com/system/resources/previews/002/206/090/non_2x/money-transaction-icon-free-vector.jpg',
-        tittle: 'Transacciones'
-      },
-      {
-        image: 'https://static.vecteezy.com/system/resources/previews/002/509/476/non_2x/statistics-report-coin-business-cash-money-line-design-free-vector.jpg',
-        tittle: 'estadísticas'
-      },
-      {
-        image: 'https://c8.alamy.com/compes/2c6xj2t/facturas-para-pagar-vector-simple-ahogado-hombre-en-deuda-con-cheque-de-pago-stickman-no-cara-clipart-dibujos-animados-dibujado-a-mano-boceto-de-fideos-ilustracion-grafica-2c6xj2t.jpg',
-        tittle: 'Deudas'
-      },
-      {
-        image: 'https://c8.alamy.com/compes/2ct01kn/icono-de-linea-negra-para-inversores-consultoria-financiera-inversion-y-ahorro-crowdfunding-invertir-dinero-en-un-nuevo-proyecto-firme-para-la-pagina-web-la-aplicacion-ui-ux-2ct01kn.jpg',
-        tittle: 'Inversiones'
-      },
-      {
-        image: 'https://us.123rf.com/450wm/sabuhinovruzov/sabuhinovruzov1812/sabuhinovruzov181200116/112874406-icono-de-l%C3%ADnea-de-lista-y-l%C3%A1piz-portapapeles-con-ilustraci%C3%B3n-de-vector-de-pluma-aislado-en-blanco.jpg?ver=6',
-        tittle: 'Reportes'
-      }]
-      */
     }
   },
   methods: {
     login() {
-
       const url = 'http://ec2-35-171-243-24.compute-1.amazonaws.com:8000/token';
       const payload = {
         grant_type: '',
@@ -182,41 +170,9 @@ export default {
     forceRerender() {
       this.AddTransactionKey += 1;  
       this.ShowMovementsKey += 1;
+      this.ShowDebitTransactionsKey += 1;
     }
-
-
-  //   async fetchGuestTokenFromBackend () {
-  //     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNjg4OTU1ODE4fQ.uk9GNKrU8jWimrjUvb3vZHfq8NYYaMqMbkqTjyi03og";
-  //     const formData = {
-  //       "user": {
-  //         "username": "frontend",
-  //         "first_name": "Frontend",
-  //         "last_name": "Frontend"
-  //       },
-  //       "resources": [{"type": "dashboard", "id": "ef551888-0fb5-447c-bc83-d658e96ccc60"}]
-  //     }
-  //     const response = await axios.post("http://localhost:8088/superset/dashboard/29/?token=6b81297f-099d-4e6c-b838-7e045495c923", formData, {headers: {'Authorization': `Bearer ${token}`}});
-  //     if (response.status == 201){
-  //       alert('Funciona');
-  //     }
-
-  //   }
-  },
-
-  mounted () {
-    // embedDashboard({
-    //   id: "abc123", // proporcionado por la interfaz de incrustación de Superset
-    //   supersetDomain: "http://localhost:8088",
-    //   mountPoint: this.$refs.supersetContainer, // ref a un elemento HTML que contendrá el iframe
-    //   fetchGuestToken: () => this.fetchGuestTokenFromBackend(),
-    //   dashboardUiConfig: {
-    //     hideTitle: true,
-    //     filters: {
-    //       expanded: true,
-    //     },
-    //   },
-    // });
-  },
+  }
 }
 </script>
 
@@ -284,5 +240,9 @@ html, body{
 }
 .view-movements{
   background-color: rgb(150, 154, 159);
+}
+
+.div-form {
+  height: 15vh;
 }
 </style>
