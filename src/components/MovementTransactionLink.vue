@@ -1,72 +1,104 @@
 <template>
   <div class="movement-transaction-link">
-    <label for="dateInput">Date:</label>
-    <input id="dateInput" type="date" :value="formattedDate" @input="updateSelectedDate" v-on:input="updateSelectedDate"/>
 
-    <h2>Movements</h2>
-    <table v-if="selectedDate" class="table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Note</th>
-          <th>Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="movement in filteredMovements" :key="movement.id" :class="{ 'selected-row': selectedMovement === movement.id }" @click="handleMovementClick(movement.id)">
-          <td>{{ movement.date }}</td>
-          <td>{{ movement.note }}</td>
-          <td>{{ movement.amount }}</td>
-        </tr>
-        <tr v-if="filteredMovements.length === 0">
-          <td colspan="2">No movements for the selected date</td>
-        </tr>
-      </tbody>
-    </table>
 
-    <h2>Debit Transactions</h2>
-    <table v-if="selectedDate" class="table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Descripción</th>
-          <th>Cantidad</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="transaction in filteredDebitTransactions" :key="transaction.id" :class="{ 'selected-row': selectedDebitTransaction === transaction.id }" @click="handleDebitTransactionClick(transaction.id)">
-          <td>{{ transaction.date }}</td>
-          <td>{{ transaction.description }}</td>
-          <td>{{ transaction.value }}</td>
-        </tr>
-        <tr v-if="filteredDebitTransactions.length === 0">
-          <td colspan="2">No debit transactions for the selected date</td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- <label for="dateInput">Date:</label>
+  <input id="dateInput" type="date" :value="formattedDate" @input="updateSelectedDate" v-on:input="updateSelectedDate"/> -->
+    <p>
+      <label for="dateSelect">Date:</label>
+      <select id="dateSelect" v-model="selectedDate" @input="updateSelectedDate" v-on:input="updateSelectedDate">
+        <option value="">Select a date</option>
+        <option v-for="date in predefinedDates" :value="date" :key="date">{{ date }}</option>
+      </select>
+    </p>
 
-    <h2>Credit Transactions</h2>
-    <table v-if="selectedDate" class="table">
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Descripción</th>
-          <th>Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="transaction in filteredCreditTransactions" :key="transaction.id" :class="{ 'selected-row': selectedCreditTransaction === transaction.id }" @click="handleCreditTransactionClick(transaction.id)">
-          <td>{{ transaction.transaction_date }}</td>
-          <td>{{ transaction.description }}</td>
-          <td>{{ transaction.original_value }}</td>
-        </tr>
-        <tr v-if="filteredCreditTransactions.length === 0">
-          <td colspan="2">No credit transactions for the selected date</td>
-        </tr>
-      </tbody>
-    </table>
+    <p>
+      <label for="transactionTypeSelect">Transaction Type:</label>
+      <select id="transactionTypeSelect" v-model="selectedTransactionType" @input="updateSelectedTransactionType" v-on:input="updateSelectedTransactionType">
+        <option value="">Select a transaction Type</option>
+        <option v-for="option in transactionsTypeOptions" :value="option" :key="option"> {{ option }}</option>
+      </select>
+    </p>
 
-    <p v-else>No date selected</p>
+    <div v-if="selectedDate && selectedTransactionType">
+      <h2>Movements</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Nota</th>
+            <th>Cantidad</th>
+            <th>Moneda</th>
+            <th>Tipo</th>
+            <th>Account/From To</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="movement in filteredMovements" :key="movement.id" :class="{ 'selected-row': selectedMovement === movement.id }" @click="handleMovementClick(movement.id)">
+            <td>{{ movement.date }}</td>
+            <td>{{ movement.note }}</td>
+            <td>{{ movement.amount }}</td>
+            <td>{{ movement.currency }}</td>
+            <td>{{ movement.type }}</td>
+            <td v-if="movement.type == 'Transfer'">{{ movement.from_account.name }} ==> {{ movement.to_account.name }}</td>
+            <td v-else>{{ movement.account.name }}</td>
+          </tr>
+          <tr v-if="filteredMovements.length === 0">
+            <td colspan="2">No movements for the selected date</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div v-if="selectedDate && selectedTransactionType && selectedTransactionType == 'Debit Transaction'">
+      <h2>Debit Transactions</h2>
+      <table v-if="selectedDate" class="table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Descripción</th>
+            <th>Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="transaction in filteredDebitTransactions" :key="transaction.id" :class="{ 'selected-row': selectedDebitTransaction === transaction.id }" @click="handleDebitTransactionClick(transaction.id)">
+            <td>{{ transaction.date }}</td>
+            <td>{{ transaction.description }}</td>
+            <td>{{ transaction.value }}</td>
+          </tr>
+          <tr v-if="filteredDebitTransactions.length === 0">
+            <td colspan="2">No debit transactions for the selected date</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div v-if="selectedDate && selectedTransactionType && selectedTransactionType == 'Credit Transaction'">
+      <h2>Credit Transactions</h2>
+      <table v-if="selectedDate" class="table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Descripción</th>
+            <th>Cantidad</th>
+            <th>Moneda</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="transaction in filteredCreditTransactions" :key="transaction.id" :class="{ 'selected-row': selectedCreditTransaction === transaction.id }" @click="handleCreditTransactionClick(transaction.id)">
+            <td>{{ transaction.transaction_date }}</td>
+            <td>{{ transaction.description }}</td>
+            <td>{{ transaction.original_value }}</td>
+            <td>{{ transaction.currency }}</td>
+          </tr>
+          <tr v-if="filteredCreditTransactions.length === 0">
+            <td colspan="2">No credit transactions for the selected date</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    
   </div>
 </template>
 <script>
@@ -79,7 +111,10 @@ export default {
   },
   data() {
     return {
+      predefinedDates: ['2023-07-15', '2023-07-16', '2023-07-17', '2023-03-02'], // Example of predefined dates
+      transactionsTypeOptions: ['Debit Transaction', 'Credit Transaction'],
       selectedDate: null,
+      selectedTransactionType: null,
       selectedMovement: null,
       selectedDebitTransaction: null,
       selectedCreditTransaction: null,
@@ -100,7 +135,6 @@ export default {
       return '';
     },
     filteredMovements() {
-      console.log("This movementn", this.movements.filter((movement) => movement.date === this.selectedDate));
       return this.movements.filter((movement) => movement.date === this.selectedDate);
     },
     filteredDebitTransactions() {
@@ -116,6 +150,9 @@ export default {
       this.fetchMovements();
       this.fetchDebitTransactions();
       this.fetchCreditTransactions();
+    },
+    updateSelectedTransactionType(event) {
+      console.log(event.target.value);
     },
     async fetchMovements() {
       try {
