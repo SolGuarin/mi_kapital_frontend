@@ -97,7 +97,8 @@
         </tbody>
       </table>
     </div>
-
+    
+    <b-button class="submit-button-link" @click="LinkTransactionMovement">Submit</b-button>
     
   </div>
 </template>
@@ -145,18 +146,30 @@ export default {
     }
   },
   methods: {
+    getDateOptions(){
+      const datesMovement = this.movements.map(i => i['date']);
+      const datesDebitTransaction = this.debit_transactions.map(i => i['date']);
+      const datesCreditTransaction = this.credit_transactions.map(i => i['date']);
+
+      var concatenatedArray = datesMovement.concat(datesDebitTransaction);
+      concatenatedArray = concatenatedArray.concat(datesCreditTransaction);
+      
+      this.predefinedDates = [...new Set(concatenatedArray)];
+
+    },
     updateSelectedDate(event) {
       this.selectedDate = event.target.value;
       this.fetchMovements();
       this.fetchDebitTransactions();
       this.fetchCreditTransactions();
+      this.getDateOptions()
     },
     updateSelectedTransactionType(event) {
       console.log(event.target.value);
     },
     async fetchMovements() {
       try {
-        const response = await axios.get('http://ec2-35-171-243-24.compute-1.amazonaws.com:8000/movements', {
+        const response = await axios.get('http://ec2-35-171-243-24.compute-1.amazonaws.com:8000/unmatched_movements', {
           headers: {
             Authorization: `Bearer ${this.accessToken}`
           },
@@ -171,7 +184,7 @@ export default {
     },
     async fetchDebitTransactions() {
       try {
-        const response = await axios.get('http://ec2-35-171-243-24.compute-1.amazonaws.com:8000/debit_transactions', {
+        const response = await axios.get('http://ec2-35-171-243-24.compute-1.amazonaws.com:8000/unmatched_debit_transactions', {
           headers: {
             Authorization: `Bearer ${this.accessToken}`
           },
@@ -186,7 +199,7 @@ export default {
     },
     async fetchCreditTransactions() {
       try {
-        const response = await axios.get('http://ec2-35-171-243-24.compute-1.amazonaws.com:8000/credit_transactions', {
+        const response = await axios.get('http://ec2-35-171-243-24.compute-1.amazonaws.com:8000/unmatched_credit_transactions', {
           headers: {
             Authorization: `Bearer ${this.accessToken}`
           },
@@ -213,6 +226,17 @@ export default {
       this.selectedCreditTransaction = id;
       console.log('Clicked Credit Transaction ID:', id);
       // Perform additional actions with the credit transaction ID and the accessToken prop
+    },
+
+    LinkTransactionMovement(){
+      console.log(this.selectedTransactionType, this.selectedMovement, this.selectedCreditTransaction, this.selectedDebitTransaction);
+      if (this.selectedTransactionType == 'Credit Transaction' & this.selectedMovement !== null & this.selectedCreditTransaction !== null){
+        alert('selectedTransactionType => ' + this.selectedTransactionType + ', selectedMovement => ' + this.selectedMovement + ', selectedCreditTransaction = > '+ this.selectedCreditTransaction);
+      } else if (this.selectedTransactionType == 'Debit Transaction' & this.selectedMovement !== null & this.selectedDebitTransaction !== null){
+        alert('selectedTransactionType => ' + this.selectedTransactionType + ', selectedMovement => ' + this.selectedMovement + ', selectedDebitTransaction = > '+ this.selectedDebitTransaction);
+      } else {
+        alert('All fields are mandatory');
+      }
     }
   },
   mounted() {
@@ -250,5 +274,14 @@ export default {
 .selected-row {
   background-color: #e2f0ff;
   cursor: pointer;
+}
+
+.submit-button-link {
+    width: 15rem;
+    height: 3rem;
+    background-color: green;
+    color: white;
+    font-size: 1rem;
+    border-radius: 0.5rem;
 }
 </style>
