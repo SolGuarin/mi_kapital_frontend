@@ -2,11 +2,12 @@
   <div class="movement-transaction-link">
 
 
-    <!-- <label for="dateInput">Date:</label>
+  <!-- <label for="dateInput">Date:</label>
   <input id="dateInput" type="date" :value="formattedDate" @input="updateSelectedDate" v-on:input="updateSelectedDate"/> -->
+
     <p>
       <label for="dateSelect">Date:</label>
-      <select id="dateSelect" v-model="selectedDate" @input="updateSelectedDate" v-on:input="updateSelectedDate">
+      <select id="dateSelect" v-model="selectedDate" @input="updateSelectedDate" v-on:input="updateSelectedDate" @click="updateSelectedDate">
         <option value="">Select a date</option>
         <option v-for="date in predefinedDates" :value="date" :key="date">{{ date }}</option>
       </select>
@@ -58,6 +59,7 @@
             <th>Date</th>
             <th>Descripción</th>
             <th>Cantidad</th>
+            <th>Cuenta</th>
           </tr>
         </thead>
         <tbody>
@@ -65,6 +67,7 @@
             <td>{{ transaction.date }}</td>
             <td>{{ transaction.description }}</td>
             <td>{{ transaction.value }}</td>
+            <td>{{ transaction.account }}</td>
           </tr>
           <tr v-if="filteredDebitTransactions.length === 0">
             <td colspan="2">No debit transactions for the selected date</td>
@@ -82,6 +85,7 @@
             <th>Descripción</th>
             <th>Cantidad</th>
             <th>Moneda</th>
+            <th>Account</th>
           </tr>
         </thead>
         <tbody>
@@ -90,6 +94,7 @@
             <td>{{ transaction.description }}</td>
             <td>{{ transaction.original_value }}</td>
             <td>{{ transaction.currency }}</td>
+            <td>{{ transaction.account }}</td>
           </tr>
           <tr v-if="filteredCreditTransactions.length === 0">
             <td colspan="2">No credit transactions for the selected date</td>
@@ -97,8 +102,10 @@
         </tbody>
       </table>
     </div>
+    <div>
+      <b-button class="submit-button-link" @click="LinkTransactionMovement">Submit</b-button>
+    </div>
     
-    <b-button class="submit-button-link" @click="LinkTransactionMovement">Submit</b-button>
     
   </div>
 </template>
@@ -112,7 +119,7 @@ export default {
   },
   data() {
     return {
-      predefinedDates: ['2023-07-15', '2023-07-16', '2023-07-17', '2023-03-02'], // Example of predefined dates
+      predefinedDates: [], // Example of predefined dates
       transactionsTypeOptions: ['Debit Transaction', 'Credit Transaction'],
       selectedDate: null,
       selectedTransactionType: null,
@@ -146,17 +153,20 @@ export default {
     }
   },
   methods: {
+
     getDateOptions(){
       const datesMovement = this.movements.map(i => i['date']);
       const datesDebitTransaction = this.debit_transactions.map(i => i['date']);
-      const datesCreditTransaction = this.credit_transactions.map(i => i['date']);
+      const datesCreditTransaction = this.credit_transactions.map(i => i['transaction_date']);
 
       var concatenatedArray = datesMovement.concat(datesDebitTransaction);
       concatenatedArray = concatenatedArray.concat(datesCreditTransaction);
       
       this.predefinedDates = [...new Set(concatenatedArray)];
-
+      this.predefinedDates.sort();
+      this.predefinedDates.reverse();
     },
+
     updateSelectedDate(event) {
       this.selectedDate = event.target.value;
       this.fetchMovements();
@@ -164,9 +174,17 @@ export default {
       this.fetchCreditTransactions();
       this.getDateOptions()
     },
+
+    cleanFields(){
+      this.selectedMovement = null;
+      this.selectedCreditTransaction = null;
+      this.selectedDebitTransaction = null;
+    },
+
     updateSelectedTransactionType(event) {
       console.log(event.target.value);
     },
+
     async fetchMovements() {
       try {
         const response = await axios.get('http://ec2-35-171-243-24.compute-1.amazonaws.com:8000/unmatched_movements', {
@@ -212,6 +230,35 @@ export default {
         console.error('Error fetching credit transactions:', error);
       }
     },
+
+    postMovementTransactionLink(movementId, debitTransactionId, creditTransactionId) {
+
+      const apiUrl = 'http://ec2-35-171-243-24.compute-1.amazonaws.com:8000/movements_transactions_link';
+
+      const data = {
+        movement_id: movementId,
+        debit_transaction_id: debitTransactionId,
+        credit_transaction_id: creditTransactionId
+      };
+
+      const headers = {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json'
+      };
+
+      // Make the POST request using axios
+      axios.post(apiUrl, data, { headers })
+        .then(response => {
+          // Handle the response if needed
+          console.log('Response:', response.data);
+        })
+        .catch(error => {
+          // Handle errors if the request fails
+          console.error('Error:', error);
+        });
+    },
+
     handleMovementClick(id) {
       this.selectedMovement = id;
       console.log('Clicked Movement ID:', id);
@@ -229,13 +276,22 @@ export default {
     },
 
     LinkTransactionMovement(){
-      console.log(this.selectedTransactionType, this.selectedMovement, this.selectedCreditTransaction, this.selectedDebitTransaction);
+
       if (this.selectedTransactionType == 'Credit Transaction' & this.selectedMovement !== null & this.selectedCreditTransaction !== null){
-        alert('selectedTransactionType => ' + this.selectedTransactionType + ', selectedMovement => ' + this.selectedMovement + ', selectedCreditTransaction = > '+ this.selectedCreditTransaction);
+        this.postMovementTransactionLink(this.selectedMovement, null, this.selectedCreditTransaction);
+        this.cleanFields();
+        this.updateSelectedDate();
+
       } else if (this.selectedTransactionType == 'Debit Transaction' & this.selectedMovement !== null & this.selectedDebitTransaction !== null){
-        alert('selectedTransactionType => ' + this.selectedTransactionType + ', selectedMovement => ' + this.selectedMovement + ', selectedDebitTransaction = > '+ this.selectedDebitTransaction);
+
+        this.postMovementTransactionLink(this.selectedMovement, this.selectedDebitTransaction);
+        this.cleanFields();
+        this.updateSelectedDate();
+
       } else {
+
         alert('All fields are mandatory');
+
       }
     }
   },
@@ -243,6 +299,7 @@ export default {
     this.fetchMovements();
     this.fetchDebitTransactions();
     this.fetchCreditTransactions();
+    this.getDateOptions()
   }
 };
 </script>

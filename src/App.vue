@@ -75,7 +75,7 @@
 
         <b-col class="view-movements d-flex justify-content-center align-items-center" >
 
-          <MovementTransactionLink :accessToken="accessToken" :key="MovementTransactionLinkKey"/>
+          <MovementTransactionLink :accessToken="accessToken" @click="refreshComponent" :key="MovementTransactionLinkKey"/>
 
           <!-- <div ref="supersetContainer" id="supersetContainer"> </div>
           <iframe src="http://localhost:8088/superset/dashboard/29/?token=6b81297f-099d-4e6c-b838-7e045495c923" width="100%" height="600"></iframe> -->
@@ -159,6 +159,7 @@ export default {
         this.accessToken = token;
         this.forceRerender()
         // Store the token in local storage or state management
+        console.log('oe');
       })
       .catch(error => {
         console.error(error);
@@ -167,10 +168,14 @@ export default {
 
       // Perform login logic here using the username and password values
     },
+    refreshComponent (){
+      this.MovementTransactionLinkKey += 1; 
+    },
     forceRerender() {
       this.AddTransactionKey += 1;  
       this.ShowMovementsKey += 1;
       this.ShowDebitTransactionsKey += 1;
+      this.MovementTransactionLinkKey += 1;
     }
   }
 }
