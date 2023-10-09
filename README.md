@@ -39,7 +39,7 @@ docker run -it -p 8080:8080 --rm --name dockerize-vuejs-app-1 mi-kapital-fronten
 ````
 
 
-### Docker Deploy
+### Deploy
 ````
 git push heroku main
 
