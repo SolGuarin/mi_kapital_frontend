@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "vue-cli-service serve",
+    "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "heroku-postbuild": "npm run build"
+    "heroku-postbuild": "npm run serve"
   },
   "dependencies": {
     "@superset-ui/embedded-sdk": "^0.1.0-alpha.9",
