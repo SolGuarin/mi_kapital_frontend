@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "heroku-postbuild": "npm run serve"
+    "heroku-postbuild": "npm run build"
   },
   "dependencies": {
     "@superset-ui/embedded-sdk": "^0.1.0-alpha.9",
