@@ -150,7 +150,8 @@ export default {
       };
       axios.post(url, new URLSearchParams(payload).toString(), {
         headers: {
-          'Access-Control-Allow-Origin': 'http://ec2-35-171-243-24.compute-1.amazonaws.com:8000',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json',
         },
