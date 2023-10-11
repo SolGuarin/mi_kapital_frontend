@@ -150,6 +150,7 @@ export default {
       };
       axios.post(url, new URLSearchParams(payload).toString(), {
         headers: {
+          'Access-Control-Allow-Origin': '*',
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json',
         },
